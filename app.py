@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
-import anthropic
+from google import genai
 import os
 import json
 import re
@@ -8,7 +8,8 @@ import re
 app = Flask(__name__, static_folder='static')
 CORS(app)
 
-client = anthropic.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
+# تهيئة عميل جوجل (سيقوم تلقائياً بجلب المفتاح من متغير البيئة GEMINI_API_KEY)
+client = genai.Client()
 
 @app.route('/')
 def index():
@@ -54,12 +55,14 @@ def analyze():
 أعطِ على الأقل 5 نتائج من مستويات مختلفة."""
 
     try:
-        message = client.messages.create(
-            model="claude-sonnet-4-6",
-            max_tokens=1500,
-            messages=[{"role": "user", "content": prompt}]
+        # استدعاء نموذج جيميناي فلاش المجاني والسريع جداً لنفس الـ prompt
+        response = client.models.generate_content(
+            model='gemini-1.5-flash',
+            contents=prompt
         )
-        raw = message.content[0].text
+        
+        # استخراج النص المسترجع من النموذج
+        raw = response.text
         clean = re.sub(r'```json|```', '', raw).strip()
         result = json.loads(clean)
         return jsonify(result)
