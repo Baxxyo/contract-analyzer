@@ -55,11 +55,11 @@ def analyze():
 أعطِ على الأقل 5 نتائج من مستويات مختلفة."""
 
     try:
-       #  الكود الصحيح
-response = client.models.generate_content(
-    model='gemini-2.5-flash',
-    contents=prompt
-)
+        # استدعاء نموذج جيميناي فلاش بالمسافات الصحيحة للداخل
+        response = client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=prompt
+        )
         
         # استخراج النص المسترجع من النموذج
         raw = response.text
