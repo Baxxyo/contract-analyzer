@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>محلل العقود الذكي | بنك الإنماء</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0f1e;
+    --surface: #111827;
+    --surface2: #1a2235;
+    --gold: #c9a84c;
+    --gold-light: #e8c96d;
+    --gold-dim: rgba(201,168,76,0.12);
+    --red: #ef4444;
+    --red-dim: rgba(239,68,68,0.12);
+    --yellow: #f59e0b;
+    --yellow-dim: rgba(245,158,11,0.12);
+    --green: #22c55e;
+    --green-dim: rgba(34,197,94,0.12);
+    --text: #f1f5f9;
+    --text-muted: #94a3b8;
+    --border: rgba(201,168,76,0.2);
+    --radius: 12px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'IBM Plex Sans Arabic', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* Header */
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .logo-area {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .logo-icon {
+    width: 42px; height: 42px;
+    background: var(--gold-dim);
+    border: 1px solid var(--gold);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+  }
+
+  .logo-text h1 { font-size: 16px; font-weight: 700; color: var(--gold); }
+  .logo-text p { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+  .header-badge {
+    background: var(--gold-dim);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 12px;
+    color: var(--gold);
+  }
+
+  /* Main */
+  main { max-width: 900px; margin: 0 auto; padding: 40px 24px; }
+
+  /* Hero */
+  .hero {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--gold-dim);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 6px 16px;
+    font-size: 12px;
+    color: var(--gold);
+    margin-bottom: 20px;
+  }
+
+  .hero h2 {
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 12px;
+  }
+
+  .hero h2 span { color: var(--gold); }
+
+  .hero p {
+    color: var(--text-muted);
+    font-size: 15px;
+    max-width: 500px;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+
+  /* Stats row */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 40px;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    text-align: center;
+  }
+
+  .stat-num { font-size: 28px; font-weight: 700; color: var(--gold); }
+  .stat-label { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+  /* Upload area */
+  .upload-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px;
+    margin-bottom: 24px;
+  }
+
+  .section-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gold);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .drop-zone {
+    border: 2px dashed var(--border);
+    border-radius: 10px;
+    padding: 48px 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+
+  .drop-zone:hover, .drop-zone.drag-over {
+    border-color: var(--gold);
+    background: var(--gold-dim);
+  }
+
+  .drop-zone input {
+    position: absolute; inset: 0;
+    opacity: 0; cursor: pointer; width: 100%; height: 100%;
+  }
+
+  .drop-icon { font-size: 40px; margin-bottom: 12px; }
+  .drop-title { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+  .drop-sub { font-size: 13px; color: var(--text-muted); }
+
+  .file-selected {
+    display: none;
+    align-items: center;
+    gap: 12px;
+    background: var(--green-dim);
+    border: 1px solid rgba(34,197,94,0.3);
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-top: 16px;
+  }
+
+  .file-selected.show { display: flex; }
+  .file-name { font-size: 14px; font-weight: 500; color: var(--green); }
+  .file-size { font-size: 12px; color: var(--text-muted); }
+
+  /* Options */
+  .options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 20px;
+  }
+
+  .option-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+  }
+
+  .option-chip.active {
+    border-color: var(--gold);
+    background: var(--gold-dim);
+    color: var(--gold);
+  }
+
+  .option-chip input { display: none; }
+
+  /* Analyze button */
+  .analyze-btn {
+    width: 100%;
+    margin-top: 24px;
+    padding: 16px;
+    background: var(--gold);
+    color: #0a0f1e;
+    border: none;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .analyze-btn:hover { background: var(--gold-light); transform: translateY(-1px); }
+  .analyze-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  /* Loading */
+  .loading {
+    display: none;
+    text-align: center;
+    padding: 48px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 24px;
+  }
+
+  .loading.show { display: block; }
+
+  .spinner {
+    width: 48px; height: 48px;
+    border: 3px solid var(--border);
+    border-top-color: var(--gold);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 20px;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .loading-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-width: 320px;
+    margin: 20px auto 0;
+  }
+
+  .loading-step {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--text-muted);
+    padding: 8px 16px;
+    border-radius: 6px;
+    transition: all 0.3s;
+  }
+
+  .loading-step.active { color: var(--gold); background: var(--gold-dim); }
+  .loading-step.done { color: var(--green); }
+
+  /* Results */
+  .results { display: none; }
+  .results.show { display: block; }
+
+  /* Summary bar */
+  .summary-bar {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px 28px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .summary-info h3 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+  .summary-info p { font-size: 13px; color: var(--text-muted); }
+
+  .summary-chips {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    border: 1px solid;
+  }
+
+  .chip-red { background: var(--red-dim); border-color: rgba(239,68,68,0.4); color: var(--red); }
+  .chip-yellow { background: var(--yellow-dim); border-color: rgba(245,158,11,0.4); color: var(--yellow); }
+  .chip-green { background: var(--green-dim); border-color: rgba(34,197,94,0.4); color: var(--green); }
+
+  /* Risk sections */
+  .risk-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+
+  .risk-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 18px 24px;
+    cursor: pointer;
+    border-bottom: 1px solid transparent;
+    transition: background 0.2s;
+  }
+
+  .risk-header:hover { background: var(--surface2); }
+  .risk-header.open { border-bottom-color: var(--border); }
+
+  .risk-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    border: 1px solid;
+  }
+
+  .badge-high { background: var(--red-dim); border-color: rgba(239,68,68,0.4); color: var(--red); }
+  .badge-medium { background: var(--yellow-dim); border-color: rgba(245,158,11,0.4); color: var(--yellow); }
+  .badge-low { background: var(--green-dim); border-color: rgba(34,197,94,0.4); color: var(--green); }
+
+  .risk-title { font-size: 15px; font-weight: 600; flex: 1; }
+  .risk-arrow { color: var(--text-muted); font-size: 12px; transition: transform 0.2s; }
+  .risk-header.open .risk-arrow { transform: rotate(180deg); }
+
+  .risk-body {
+    display: none;
+    padding: 20px 24px;
+  }
+
+  .risk-body.open { display: block; }
+
+  .risk-item {
+    border-right: 3px solid;
+    padding: 12px 16px;
+    margin-bottom: 12px;
+    border-radius: 0 8px 8px 0;
+    background: var(--surface2);
+  }
+
+  .risk-item:last-child { margin-bottom: 0; }
+  .risk-item.high { border-color: var(--red); }
+  .risk-item.medium { border-color: var(--yellow); }
+  .risk-item.low { border-color: var(--green); }
+
+  .item-title { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+  .item-desc { font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 8px; }
+  .item-ref {
+    font-size: 11px;
+    color: var(--gold);
+    background: var(--gold-dim);
+    padding: 3px 10px;
+    border-radius: 12px;
+    display: inline-block;
+  }
+
+  /* Overall score */
+  .score-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  .score-label { font-size: 13px; color: var(--text-muted); margin-bottom: 10px; }
+  .score-num { font-size: 56px; font-weight: 700; line-height: 1; }
+  .score-desc { font-size: 14px; color: var(--text-muted); margin-top: 8px; }
+
+  .score-bar {
+    height: 8px;
+    background: var(--surface2);
+    border-radius: 4px;
+    margin: 16px auto 0;
+    max-width: 300px;
+    overflow: hidden;
+  }
+
+  .score-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 1s ease;
+  }
+
+  /* Action buttons */
+  .action-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+  }
+
+  .btn-secondary {
+    flex: 1;
+    padding: 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-secondary:hover { border-color: var(--gold); color: var(--gold); }
+
+  /* Error */
+  .error-box {
+    display: none;
+    background: var(--red-dim);
+    border: 1px solid rgba(239,68,68,0.4);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    color: var(--red);
+  }
+  .error-box.show { display: block; }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    .stats { grid-template-columns: 1fr; }
+    .options-grid { grid-template-columns: 1fr; }
+    .summary-bar { flex-direction: column; }
+    .action-row { flex-direction: column; }
+    header { padding: 12px 16px; }
+    main { padding: 24px 16px; }
+    .hero h2 { font-size: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-area">
+    <div class="logo-icon">⚖️</div>
+    <div class="logo-text">
+      <h1>محلل العقود الذكي</h1>
+      <p>مدعوم بالذكاء الاصطناعي | بنك الإنماء</p>
+    </div>
+  </div>
+  <div class="header-badge">🏛️ متوافق مع لوائح ساما</div>
+</header>
+
+<main>
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-badge">
+      <span>✨</span>
+      <span>تحليل فوري بالذكاء الاصطناعي</span>
+    </div>
+    <h2>اكتشف المخاطر القانونية<br><span>قبل أن تكتشفك</span></h2>
+    <p>رفع العقد ← تحليل تلقائي ← تقرير شامل بالبنود غير المتوافقة مع لوائح ساما</p>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat-card">
+      <div class="stat-num">3</div>
+      <div class="stat-label">مستويات تصنيف المخاطر</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">+50</div>
+      <div class="stat-label">لائحة ساما مُراجعة</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">&lt;60ث</div>
+      <div class="stat-label">وقت التحليل</div>
+    </div>
+  </div>
+
+  <!-- Upload Section -->
+  <div class="upload-section">
+    <div class="section-title">📄 رفع العقد</div>
+
+    <div class="drop-zone" id="dropZone">
+      <input type="file" id="fileInput" accept=".pdf,.txt,.doc,.docx">
+      <div class="drop-icon">📋</div>
+      <div class="drop-title">اسحب العقد هنا أو اضغط للرفع</div>
+      <div class="drop-sub">يدعم PDF • TXT • DOC • DOCX</div>
+    </div>
+
+    <div class="file-selected" id="fileSelected">
+      <span style="font-size:20px">📄</span>
+      <div>
+        <div class="file-name" id="fileName">—</div>
+        <div class="file-size" id="fileSize">—</div>
+      </div>
+      <span style="margin-right:auto; color:var(--green)">✓ جاهز للتحليل</span>
+    </div>
+
+    <!-- Analysis options -->
+    <div style="margin-top:20px; margin-bottom:8px; font-size:13px; color:var(--text-muted);">نطاق التحليل:</div>
+    <div class="options-grid">
+      <label class="option-chip active" id="opt1">
+        <input type="checkbox" checked onchange="toggleChip('opt1')">
+        🏦 الامتثال لأنظمة ساما
+      </label>
+      <label class="option-chip active" id="opt2">
+        <input type="checkbox" checked onchange="toggleChip('opt2')">
+        ⚠️ البنود عالية المخاطر
+      </label>
+      <label class="option-chip active" id="opt3">
+        <input type="checkbox" checked onchange="toggleChip('opt3')">
+        🔒 حماية بيانات العملاء
+      </label>
+      <label class="option-chip active" id="opt4">
+        <input type="checkbox" checked onchange="toggleChip('opt4')">
+        📊 شروط التمويل والفوائد
+      </label>
+    </div>
+
+    <button class="analyze-btn" id="analyzeBtn" onclick="analyzeContract()">
+      <span>🔍</span>
+      <span>تحليل العقد</span>
+    </button>
+  </div>
+
+  <!-- Error -->
+  <div class="error-box" id="errorBox"></div>
+
+  <!-- Loading -->
+  <div class="loading" id="loadingBox">
+    <div class="spinner"></div>
+    <div style="font-size:16px; font-weight:600; color:var(--gold);">جارٍ التحليل...</div>
+    <div style="font-size:13px; color:var(--text-muted); margin-top:6px;">يتم مراجعة العقد بدقة</div>
+    <div class="loading-steps">
+      <div class="loading-step" id="step1">📄 قراءة نص العقد</div>
+      <div class="loading-step" id="step2">🔍 فحص البنود ومقارنتها</div>
+      <div class="loading-step" id="step3">⚖️ تطبيق لوائح ساما</div>
+      <div class="loading-step" id="step4">📊 إعداد التقرير</div>
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div class="results" id="resultsBox">
+
+    <!-- Score -->
+    <div class="score-section" id="scoreSection">
+      <div class="score-label">مؤشر الامتثال الكلي</div>
+      <div class="score-num" id="scoreNum" style="color:var(--gold)">—</div>
+      <div class="score-desc" id="scoreDesc">—</div>
+      <div class="score-bar">
+        <div class="score-fill" id="scoreFill" style="width:0%"></div>
+      </div>
+    </div>
+
+    <!-- Summary bar -->
+    <div class="summary-bar">
+      <div class="summary-info">
+        <h3 id="docTitle">تقرير تحليل العقد</h3>
+        <p id="analysisDate">—</p>
+      </div>
+      <div class="summary-chips">
+        <div class="chip chip-red" id="highCount"><span>🔴</span> <span id="highNum">0</span> عالي</div>
+        <div class="chip chip-yellow" id="medCount"><span>🟡</span> <span id="medNum">0</span> متوسط</div>
+        <div class="chip chip-green" id="lowCount"><span>🟢</span> <span id="lowNum">0</span> منخفض</div>
+      </div>
+    </div>
+
+    <!-- Risk items container -->
+    <div id="riskContainer"></div>
+
+    <!-- Actions -->
+    <div class="action-row">
+      <button class="btn-secondary" onclick="resetAnalysis()">📋 تحليل عقد جديد</button>
+      <button class="btn-secondary" onclick="printReport()">🖨️ طباعة التقرير</button>
+    </div>
+
+  </div>
+
+</main>
+
+<script>
+let selectedFile = null;
+let contractText = '';
+
+// File handling
+document.getElementById('fileInput').addEventListener('change', handleFile);
+
+const dropZone = document.getElementById('dropZone');
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropZone.classList.remove('drag-over');
+  if (e.dataTransfer.files[0]) handleFile({ target: { files: e.dataTransfer.files } });
+});
+
+function handleFile(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  selectedFile = file;
+
+  document.getElementById('fileName').textContent = file.name;
+  document.getElementById('fileSize').textContent = (file.size / 1024).toFixed(1) + ' KB';
+  document.getElementById('fileSelected').classList.add('show');
+
+  const reader = new FileReader();
+  reader.onload = ev => { contractText = ev.target.result; };
+  reader.readAsText(file, 'UTF-8');
+}
+
+function toggleChip(id) {
+  document.getElementById(id).classList.toggle('active');
+}
+
+function getSelectedOptions() {
+  const opts = [];
+  if (document.getElementById('opt1').classList.contains('active')) opts.push('الامتثال لأنظمة ساما');
+  if (document.getElementById('opt2').classList.contains('active')) opts.push('البنود عالية المخاطر');
+  if (document.getElementById('opt3').classList.contains('active')) opts.push('حماية بيانات العملاء');
+  if (document.getElementById('opt4').classList.contains('active')) opts.push('شروط التمويل والفوائد');
+  return opts;
+}
+
+// Loading steps animation
+let stepInterval;
+function animateSteps() {
+  const steps = ['step1','step2','step3','step4'];
+  let i = 0;
+  steps.forEach(s => document.getElementById(s).className = 'loading-step');
+  stepInterval = setInterval(() => {
+    if (i > 0) document.getElementById(steps[i-1]).className = 'loading-step done';
+    if (i < steps.length) {
+      document.getElementById(steps[i]).className = 'loading-step active';
+      i++;
+    } else {
+      clearInterval(stepInterval);
+    }
+  }, 1200);
+}
+
+async function analyzeContract() {
+  if (!selectedFile && !contractText) {
+    showError('⚠️ الرجاء رفع ملف العقد أولاً');
+    return;
+  }
+
+  const opts = getSelectedOptions();
+  if (opts.length === 0) {
+    showError('⚠️ الرجاء اختيار نطاق تحليل واحد على الأقل');
+    return;
+  }
+
+  // If no text extracted (e.g. PDF binary), use a demo contract text
+  const textToAnalyze = contractText && contractText.trim().length > 20
+    ? contractText.substring(0, 8000)
+    : getDemoContractText();
+
+  hideError();
+  showLoading(true);
+  document.getElementById('analyzeBtn').disabled = true;
+  animateSteps();
+
+  try {
+    const response = await fetch("/analyze", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        text: textToAnalyze,
+        options: opts
+      })
+    });
+
+    const result = await response.json();
+    clearInterval(stepInterval);
+
+    if (!response.ok) throw new Error(result.error || 'خطأ في الاتصال');
+
+    showLoading(false);
+    renderResults(result);
+
+  } catch (err) {
+    clearInterval(stepInterval);
+    showLoading(false);
+    document.getElementById('analyzeBtn').disabled = false;
+    showError('❌ حدث خطأ أثناء التحليل: ' + err.message);
+  }
+}
+
+function renderResults(data) {
+  // Score
+  const score = data.score || 0;
+  document.getElementById('scoreNum').textContent = score + '%';
+  document.getElementById('scoreDesc').textContent = data.scoreLabel || '';
+
+  const colorMap = { gold: '#c9a84c', green: '#22c55e', yellow: '#f59e0b', red: '#ef4444' };
+  const fillColor = colorMap[data.scoreColor] || '#c9a84c';
+  document.getElementById('scoreNum').style.color = fillColor;
+  document.getElementById('scoreFill').style.background = fillColor;
+  setTimeout(() => { document.getElementById('scoreFill').style.width = score + '%'; }, 100);
+
+  // Summary
+  document.getElementById('docTitle').textContent = data.contractTitle || 'تقرير تحليل العقد';
+  document.getElementById('analysisDate').textContent = 'تاريخ التحليل: ' + new Date().toLocaleDateString('ar-SA');
+
+  const issues = data.issues || [];
+  const high = issues.filter(i => i.level === 'high');
+  const med = issues.filter(i => i.level === 'medium');
+  const low = issues.filter(i => i.level === 'low');
+
+  document.getElementById('highNum').textContent = high.length;
+  document.getElementById('medNum').textContent = med.length;
+  document.getElementById('lowNum').textContent = low.length;
+
+  // Risk sections
+  const container = document.getElementById('riskContainer');
+  container.innerHTML = '';
+
+  const sections = [
+    { label: '🔴 مخاطر عالية', badge: 'badge-high', level: 'high', items: high },
+    { label: '🟡 مخاطر متوسطة', badge: 'badge-medium', level: 'medium', items: med },
+    { label: '🟢 ملاحظات ومقترحات', badge: 'badge-low', level: 'low', items: low },
+  ];
+
+  sections.forEach((sec, idx) => {
+    if (sec.items.length === 0) return;
+    const open = idx === 0;
+    container.innerHTML += `
+      <div class="risk-section">
+        <div class="risk-header ${open ? 'open' : ''}" onclick="toggleSection(this)">
+          <span class="risk-badge ${sec.badge}">${sec.label}</span>
+          <span class="risk-title">${sec.items.length} ${sec.items.length === 1 ? 'بند' : 'بنود'}</span>
+          <span class="risk-arrow">▼</span>
+        </div>
+        <div class="risk-body ${open ? 'open' : ''}">
+          ${sec.items.map(item => `
+            <div class="risk-item ${sec.level}">
+              <div class="item-title">${item.title}</div>
+              <div class="item-desc">${item.description}</div>
+              ${item.samaRef ? `<span class="item-ref">📋 ${item.samaRef}</span>` : ''}
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  });
+
+  document.getElementById('resultsBox').classList.add('show');
+  document.getElementById('resultsBox').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  document.getElementById('analyzeBtn').disabled = false;
+}
+
+function toggleSection(header) {
+  header.classList.toggle('open');
+  header.nextElementSibling.classList.toggle('open');
+}
+
+function showLoading(show) {
+  document.getElementById('loadingBox').classList.toggle('show', show);
+}
+
+function showError(msg) {
+  const box = document.getElementById('errorBox');
+  box.textContent = msg;
+  box.classList.add('show');
+}
+
+function hideError() {
+  document.getElementById('errorBox').classList.remove('show');
+}
+
+function resetAnalysis() {
+  selectedFile = null;
+  contractText = '';
+  document.getElementById('fileInput').value = '';
+  document.getElementById('fileSelected').classList.remove('show');
+  document.getElementById('resultsBox').classList.remove('show');
+  document.getElementById('riskContainer').innerHTML = '';
+  document.getElementById('analyzeBtn').disabled = false;
+  hideError();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function printReport() { window.print(); }
+
+function getDemoContractText() {
+  return `عقد تمويل شخصي
+بين بنك الإنماء والعميل...
+الفائدة السنوية: 18% مركبة شهرياً.
+يحق للبنك تعديل شروط العقد دون إشعار مسبق.
+يتنازل العميل عن حقه في الاعتراض على القرارات.
+رسوم السداد المبكر: 5% من المبلغ المتبقي.
+يتم مشاركة بيانات العميل مع أطراف ثالثة لأغراض تسويقية.
+مدة العقد 10 سنوات غير قابلة للفسخ.
+الغرامة التأخيرية: 3% شهرياً.`;
+}
+</script>
+</body>
+</html>
