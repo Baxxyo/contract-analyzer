@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل الدخول</title>
+    <style>
+        /* تهيئة الخلفية الداكنة المتناسقة مع index.html */
+        body {
+            background-color: #0f172a; 
+            color: #f8fafc;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* الحاوية الرئيسية لمنع أي تكرار أفقي للعناصر */
+        .usr-page-wrapper-block {
+            width: 100%;
+            max-width: 450px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* حاوية النموذج المصممة بأسلوب بطاقات النظام */
+        .usr-auth-layout-box {
+            width: 100%;
+            padding: 40px;
+            background: #1e293b; 
+            border: 1px solid #334155;
+            border-radius: 16px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+            box-sizing: border-box;
+        }
+
+        .usr-auth-layout-title {
+            text-align: center;
+            color: #ffffff;
+            margin-bottom: 30px;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .usr-layout-field-group {
+            margin-bottom: 24px;
+        }
+
+        .usr-layout-field-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #94a3b8;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .usr-layout-input-component {
+            width: 100%;
+            padding: 14px 16px;
+            background-color: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 10px;
+            color: #ffffff;
+            box-sizing: border-box;
+            font-size: 16px;
+            transition: all 0.2s ease;
+        }
+
+        .usr-layout-input-component:focus {
+            outline: none;
+            border-color: #38bdf8;
+            box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
+        }
+
+        .usr-layout-action-btn {
+            width: 100%;
+            padding: 14px;
+            background-color: #0284c7;
+            color: #ffffff;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            margin-top: 10px;
+        }
+
+        .usr-layout-action-btn:hover {
+            background-color: #0369a1;
+        }
+
+        .usr-layout-action-btn:active {
+            transform: scale(0.98);
+        }
+
+        .usr-layout-alert-status {
+            margin-top: 20px;
+            padding: 12px;
+            border-radius: 8px;
+            display: none;
+            text-align: center;
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .usr-layout-nav-link {
+            display: block;
+            text-align: center;
+            margin-top: 25px;
+            color: #38bdf8;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s ease;
+        }
+
+        .usr-layout-nav-link:hover {
+            color: #7dd3fc;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<div class="usr-page-wrapper-block">
+    <div class="usr-auth-layout-box">
+        <h2 class="usr-auth-layout-title">تسجيل الدخول</h2>
+        <form id="usrLoginForm">
+            <div class="usr-layout-field-group">
+                <label>اسم المستخدم</label>
+                <input type="text" id="usrLoginName" class="usr-layout-input-component" required autocomplete="username">
+            </div>
+            <div class="usr-layout-field-group">
+                <label>كلمة المرور</label>
+                <input type="password" id="usrLoginPass" class="usr-layout-input-component" required autocomplete="current-password">
+            </div>
+            <button type="submit" class="usr-layout-action-btn">دخول</button>
+        </form>
+        <div id="usrLoginMsg" class="usr-layout-alert-status"></div>
+        <a href="signup.html" class="usr-layout-nav-link">ليس لديك حساب؟ أنشئ حساباً جديداً الآن</a>
+    </div>
+</div>
+
+<script>
+    document.getElementById('usrLoginForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const username = document.getElementById('usrLoginName').value;
+        const password = document.getElementById('usrLoginPass').value;
+        const msgBox = document.getElementById('usrLoginMsg');
+
+        try {
+            const response = await fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+            const data = await response.json();
+            
+            msgBox.style.display = 'block';
+            if (response.ok) {
+                msgBox.style.backgroundColor = 'rgba(34, 197, 94, 0.15)';
+                msgBox.style.color = '#4ade80';
+                msgBox.style.border = '1px solid rgba(74, 222, 128, 0.4)';
+                msgBox.innerHTML = data.message;
+                
+                localStorage.setItem('activeUser', data.user);
+                setTimeout(() => window.location.href = '/', 1500);
+            } else {
+                msgBox.style.backgroundColor = 'rgba(239, 68, 68, 0.15)';
+                msgBox.style.color = '#f87171';
+                msgBox.style.border = '1px solid rgba(248, 113, 113, 0.4)';
+                msgBox.innerHTML = data.error;
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    });
+</script>
+</body>
+</html>
